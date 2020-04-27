@@ -447,8 +447,8 @@ public class IvyModuleSetBuild extends AbstractIvyBuild<IvyModuleSet, IvyModuleS
                             return Result.FAILURE;
 
                         Properties additionalProperties = null;
+                        parseIvyDescriptorFiles(listener, logger, envVars);
                         if (project.isIncrementalBuild()) {
-                            parseIvyDescriptorFiles(listener, logger, envVars);
                             List<String> changedModules = new ArrayList<>();
                             for (IvyModule m : project.sortedActiveModules) {
                                 // Check if incrementalBuild is selected and that
@@ -469,11 +469,11 @@ public class IvyModuleSetBuild extends AbstractIvyBuild<IvyModuleSet, IvyModuleS
                                         .getChangedModulesProperty(), StringUtils.join(changedModules, ','));
                             }
                         }
-                        
+
                         IvyBuilderType ivyBuilderType = project.getIvyBuilderType();
                         hudson.tasks.Builder builder = ivyBuilderType.getBuilder(additionalProperties, null, buildEnvironments);
                         logger.println("Building project with " + ivyBuilderType.getDescriptor().getDisplayName());
-                        
+
                         if (builder.perform(IvyModuleSetBuild.this, launcher, listener))
                             return Result.SUCCESS;
 
@@ -525,7 +525,7 @@ public class IvyModuleSetBuild extends AbstractIvyBuild<IvyModuleSet, IvyModuleS
             List<IvyModuleInfo> ivyDescriptors;
             // 2015-11-25 Matthias Bechtold: Parse all modules in workspace rather than the first module's folder - fixes JENKINS-13440
             FilePath moduleRoot = getModuleRoots().length>1 ? getModuleRoot().getParent() : getModuleRoot();
-            try { 
+            try {
             	IvyXmlParser parser = new IvyXmlParser(listener, project, settings, moduleRoot.getRemote());
             	if (moduleRoot.getChannel() instanceof Channel)
             		((Channel) moduleRoot.getChannel()).preloadJar(parser, Ivy.class);
@@ -608,7 +608,7 @@ public class IvyModuleSetBuild extends AbstractIvyBuild<IvyModuleSet, IvyModuleS
         @Override
         public void cleanUp(BuildListener listener) throws Exception {
             super.cleanUp(listener);
-        
+
             if (project.isAggregatorStyleBuild()) {
                 // schedule downstream builds. for non aggregator style builds,
                 // this is done by each module
@@ -834,13 +834,13 @@ public class IvyModuleSetBuild extends AbstractIvyBuild<IvyModuleSet, IvyModuleS
          */
         public Ivy getIvy(PrintStream logger) throws AbortException {
             Message.setDefaultLogger(new IvyMessageImpl());
-            
+
             File settingsLoc = (ivySettingsFile == null) ? null : new File(ivySettingsFile);
 
             if ((settingsLoc != null) && (!settingsLoc.exists())) {
                 throw new AbortException(Messages.IvyModuleSetBuild_NoSuchIvySettingsFile(settingsLoc.getAbsolutePath()));
             }
-            
+
             ArrayList<File> propertyFiles = new ArrayList<>();
             if (StringUtils.isNotBlank(ivySettingsPropertyFiles)) {
                 for (String file : StringUtils.split(ivySettingsPropertyFiles, ',')) {
@@ -854,7 +854,7 @@ public class IvyModuleSetBuild extends AbstractIvyBuild<IvyModuleSet, IvyModuleS
                     propertyFiles.add(propertyFile);
                 }
             }
-            
+
             try {
                 IvySettings ivySettings = new IvySettings();
                 for (File file : propertyFiles) {

@@ -541,7 +541,7 @@ public class IvyBuildTrigger extends Notifier implements DependencyDeclarer {
                 if (p != null && p instanceof Project) {
                     if (captures(rid, (Project) p)) {
                         found = true;
-                        graph.addDependency(new IvyThresholdDependency(p, owner, triggerWhenUnstable ? Result.UNSTABLE : Result.SUCCESS, useUpstreamParameters));
+                        graph.addDependency(new IvyThresholdDependency(p, owner, triggerWhenUnstable ? Result.UNSTABLE : Result.SUCCESS, useUpstreamParameters, false));
                     }
                 }
             }

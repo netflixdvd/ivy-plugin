@@ -1,6 +1,6 @@
 /*
  * Copyright 2010-2011 Timothy Bingaman, Jesse Bexten
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -30,23 +30,26 @@ import hudson.model.TaskListener;
 /**
  * Invoke downstream projects with applicable parameters using Jenkins'
  * DependencyGraph.Dependency interface.
- * 
+ *
  * @author tbingaman
  */
 public class IvyThresholdDependency extends IvyDependency {
 
     private final Result threshold;
     private final boolean useUpstreamParameters;
+    private final boolean ivyTriggersDownstreamBuilds;
 
-    public IvyThresholdDependency(AbstractProject<?, ?> upstream, AbstractProject<?, ?> downstream, Result threshold, boolean useUpstreamParameters) {
+    public IvyThresholdDependency(AbstractProject<?, ?> upstream, AbstractProject<?, ?> downstream, Result threshold, boolean useUpstreamParameters, boolean ivyTriggersDownstreamBuilds) {
         super(upstream, downstream);
         this.threshold = threshold;
         this.useUpstreamParameters = useUpstreamParameters;
+        this.ivyTriggersDownstreamBuilds = ivyTriggersDownstreamBuilds;
     }
 
     @Override
     public boolean shouldTriggerBuild(AbstractBuild build, TaskListener listener, List<Action> actions) {
-        if (build.getResult().isBetterOrEqualTo(threshold))
+        // don't trigger builds using the BuildTrigger system if we're using the ivy trigger system too.
+        if (build.getResult().isBetterOrEqualTo(threshold) && !ivyTriggersDownstreamBuilds)
         {
         	if(useUpstreamParameters)
         	{
